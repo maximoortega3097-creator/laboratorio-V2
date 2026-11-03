@@ -1,0 +1,10 @@
+
+{
+  "name": "laboratorio-privacidad",
+  "version": "1.0.0",
+  "description": "Laboratorio educativo de privacidad digital",
+  "main": "servidor.js",
+  "scripts": {
+    "start": "node servidor.js"
+  }
+}

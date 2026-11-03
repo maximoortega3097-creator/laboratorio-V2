@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Laboratorio de privacidad digital</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #101827;
+            color: white;
+            text-align: center;
+            padding: 40px 15px;
+        }
+
+        .contenedor {
+            max-width: 500px;
+            margin: auto;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        h1 {
+            color: #38bdf8;
+        }
+
+        input[type="text"] {
+            box-sizing: border-box;
+            width: 90%;
+            padding: 13px;
+            border-radius: 8px;
+            border: none;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 14px 25px;
+            background: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0369a1;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        #resultado {
+            margin-top: 25px;
+            color: #4ade80;
+        }
+
+        .aviso {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <h1>Laboratorio de privacidad digital</h1>
+
+    <p>
+        ¿Qué información puede conocer una página web
+        cuando la visitas?
+    </p>
+
+    <p>Escribe tu nombre o código de participante:</p>
+
+    <input
+        type="text"
+        id="nombre"
+        maxlength="60"
+        placeholder="Nombre o código"
+        autocomplete="off"
+    >
+
+    <br>
+
+    <label>
+        <input type="checkbox" id="consentimiento">
+        Acepto participar y compartir mi nombre o código
+        y los datos técnicos descritos en esta actividad.
+    </label>
+
+    <br><br>
+
+    <button id="boton" onclick="participar()">
+        Participar en la demostración
+    </button>
+
+    <div id="resultado" aria-live="polite"></div>
+
+    <p class="aviso">
+        Actividad educativa. Los datos se enviarán al servidor
+        del profesor para esta demostración. No se solicita
+        acceso a la ubicación GPS.
+    </p>
+
+</div>
+
+<script>
+
+async function participar() {
+
+    const resultado = document.getElementById("resultado");
+    const boton = document.getElementById("boton");
+
+    const consentimiento =
+        document.getElementById("consentimiento");
+
+    const nombre =
+        document.getElementById("nombre").value.trim();
+
+    if (!nombre) {
+        resultado.textContent =
+            "Por favor, escribe tu nombre o código.";
+        return;
+    }
+
+    if (!consentimiento.checked) {
+        resultado.textContent =
+            "Primero debes aceptar participar.";
+        return;
+    }
+
+    resultado.textContent = "Enviando información...";
+    boton.disabled = true;
+
+    const datos = {
+
+        nombre: nombre,
+
+        navegador: navigator.userAgent,
+
+        plataforma: navigator.platform,
+
+        idioma: navigator.language,
+
+        movil: /Android|iPhone|iPad|Mobile/i.test(
+            navigator.userAgent
+        ),
+
+        pantalla: screen.width + "x" + screen.height
+
+    };
+
+    try {
+
+        const respuesta = await fetch("/registrar", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(datos)
+
+        });
+
+        if (!respuesta.ok) {
+            throw new Error("Error del servidor");
+        }
+
+        resultado.textContent =
+            "¡Gracias! Tu participación fue registrada.";
+
+    } catch (error) {
+
+        resultado.textContent =
+            "No se pudo conectar con el servidor. Intenta nuevamente.";
+
+    } finally {
+
+        boton.disabled = false;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
